@@ -1,6 +1,6 @@
 # Lee English
 
-**Live site:** https://leanhduc1989.github.io/lee-english/
+**Live site:** https://leanhduc1989.github.io/Lee-English/
 
 Free web app for learning everyday workplace English (HR, banking, real estate, energy), IELTS 6.0 level.
 
