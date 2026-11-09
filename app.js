@@ -11,8 +11,16 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
 
 /* ---------- speech out ---------- */
 let voice = null, playing = false; const ttsOk = 'speechSynthesis' in window;
-function pickVoice() { if (!ttsOk) return; const vs = speechSynthesis.getVoices(); voice = vs.find(v => /en-GB/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null; }
-if (ttsOk) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+const FEMALE = /(samantha|serena|kate|karen|moira|tessa|victoria|fiona|martha|susan|zira|hazel|libby|sonia|maisie|aria|jenny|emma|amy|joanna|salli|kimberly|ava|allison|female|woman)/i;
+const MALE = /(daniel|alex\b|fred|oliver|arthur|george|ryan|guy|thomas|aaron|gordon|rishi|male|\bman\b)/i;
+const enVoices = () => ttsOk ? speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang)) : [];
+function pickVoice() {
+  if (!ttsOk) return; const vs = enVoices(); if (!vs.length) return;
+  if (DB.voice) { const v = vs.find(x => x.name === DB.voice); if (v) { voice = v; return; } }
+  const sc = v => (FEMALE.test(v.name) ? 6 : 0) - (MALE.test(v.name) ? 6 : 0) + (/en-GB/i.test(v.lang) ? 3 : /en-US/i.test(v.lang) ? 1 : 0) + (/google|natural|premium|enhanced/i.test(v.name) ? 1 : 0);
+  voice = vs.slice().sort((a, b) => sc(b) - sc(a))[0];
+}
+if (ttsOk) { pickVoice(); speechSynthesis.onvoiceschanged = () => { pickVoice(); if (VIEW === 'home') render(); }; }
 function speak(text, rate, onend) { if (!ttsOk) { onend && onend(); return; } try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); if (voice) u.voice = voice; u.lang = voice ? voice.lang : 'en-GB'; u.rate = rate || 0.95; u.onend = () => onend && onend(); speechSynthesis.speak(u); } catch (e) { onend && onend(); } }
 function stopSpeech() { playing = false; if (ttsOk) try { speechSynthesis.cancel(); } catch (e) {} }
 function playFrom(i) { playing = true; S.listen.line = i; save(); render(); speak(L.lines[i], 0.92, () => { if (!playing) return; if (i + 1 < L.lines.length) playFrom(i + 1); else { playing = false; render(); } }); }
@@ -73,25 +81,61 @@ function compare(target, heard) {
   return { tokens: out, score: n ? Math.round(ok / n * 100) : 0 };
 }
 
+/* ---------- one topic per day ---------- */
+const dayKey = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+function order() {
+  const by = {}; window.LESSONS.forEach(l => (by[l.field] = by[l.field] || []).push(l));
+  const out = []; let more = true, k = 0;
+  while (more) { more = false; FIELDS.forEach(f => { const l = (by[f] || [])[k]; if (l) { out.push(l); more = true; } }); k++; }
+  return out;
+}
+const isDone = l => pctOf(l, DB.progress[l.id]) >= 100;
+function ensureDaily() {
+  const today = dayKey(), ord = order();
+  if (DB.daily && DB.daily.date === today && ord.some(l => l.id === DB.daily.id)) return;
+  let pick = null;
+  const prev = DB.daily && ord.find(l => l.id === DB.daily.id);
+  if (prev && !isDone(prev)) pick = prev;
+  if (!pick && !DB.daily && DB.last) { const l = ord.find(x => x.id === DB.last); if (l && !isDone(l)) pick = l; }
+  if (!pick) pick = ord.find(l => !isDone(l));
+  if (!pick) { const i = prev ? ord.indexOf(prev) : -1; pick = ord[(i + 1) % ord.length]; }
+  DB.daily = { date: today, id: pick.id }; saveDB();
+}
+function streak() {
+  const set = new Set(DB.doneDates || []); let n = 0; const d = new Date();
+  if (!set.has(dayKey(d))) d.setDate(d.getDate() - 1);
+  while (set.has(dayKey(d))) { n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+function tomorrowField() { const ord = order(); const cur = ord.findIndex(l => l.id === DB.daily.id); const nx = ord.slice(cur + 1).concat(ord.slice(0, cur)).find(l => !isDone(l) && l.id !== DB.daily.id); return nx ? nx.field : null; }
+
 /* ---------- views ---------- */
 const FIELDS = ['HR', 'BANKING', 'REAL ESTATE', 'ENERGY'];
 const FIELD_VI = { HR: 'Nhân sự', BANKING: 'Ngân hàng', 'REAL ESTATE': 'Bất động sản', ENERGY: 'Năng lượng' };
 function vHome() {
   if (!DB.name) return `<div style="padding-top:40px;display:flex;flex-direction:column;gap:16px"><span class="lee" style="width:72px;height:72px;border-radius:20px;font-size:38px">L</span><h1 style="font-size:30px">Learn English<br>with Lee</h1><div class="sub">Everyday workplace English for HR, banking, real estate and energy. Target: IELTS 6.0.</div><label class="q" for="nameIn">What should Lee call you?</label><input type="text" id="nameIn" placeholder="Your name" autocomplete="given-name"><button class="btn" data-a="setName">Start learning</button><div class="note">No account needed. Your progress is saved on this device.</div></div>`;
-  const last = DB.last && window.LESSONS.find(x => x.id === DB.last);
-  const card = l => { const p = pctOf(l, DB.progress[l.id]); return `<button class="steps-item" data-a="open" data-id="${l.id}" style="width:100%;text-align:left;display:flex;gap:12px;align-items:center;background:var(--s1);border:1px solid ${p >= 100 ? 'var(--green-d)' : 'var(--line)'};border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--text)"><span style="flex-grow:1;min-width:0"><span style="display:block;font-size:15px;font-weight:600;line-height:1.3">${esc(l.title)}</span><span style="display:block;font-size:12px;color:var(--muted);margin-top:3px">${esc(l.storyTitle)}</span></span><span class="h" style="font-weight:700;color:${p >= 100 ? '#44D62C' : p > 0 ? '#FFC24B' : '#8A8A8A'}">${p >= 100 ? '✓' : p + '%'}</span></button>`; };
-  const groups = FIELDS.map(f => { const ls = window.LESSONS.filter(x => x.field === f); return ls.length ? `<div style="display:flex;flex-direction:column;gap:8px"><div class="kicker">${f} · <span style="color:var(--muted);letter-spacing:0">${FIELD_VI[f]}</span></div>${ls.map(card).join('')}</div>` : ''; }).join('');
-  const done = window.LESSONS.filter(l => pctOf(l, DB.progress[l.id]) >= 100).length;
-  return `<div class="row" style="justify-content:space-between;padding-top:8px"><div class="row"><span class="lee">L</span><div><div style="font-size:12px;color:var(--muted)">Welcome back</div><div class="h" style="font-size:18px;font-weight:700">Hi ${esc(DB.name)}!</div></div></div><div style="text-align:right"><div class="pct">${done}/${window.LESSONS.length}</div><div style="font-size:11px;color:var(--muted)">lessons done</div></div></div>
-  ${last && pctOf(last, DB.progress[last.id]) < 100 ? `<div class="card" style="border-color:var(--green);background:var(--green-bg)"><div style="font-size:12px;font-weight:700;color:var(--green);letter-spacing:.6px">PICK UP WHERE YOU LEFT OFF</div><div style="font-size:16px;font-weight:600">${esc(last.title)} · ${pctOf(last, DB.progress[last.id])}%</div><button class="btn" data-a="open" data-id="${last.id}">${ico.play} Resume</button></div>` : ''}
-  ${groups}
-  <div class="note">Tap any English word to hear it. ${SR ? 'Speaking practice uses your microphone – allow it when asked.' : 'For speaking practice with the microphone, open this page in Safari (iPhone) or Chrome/Edge (computer).'} Progress is saved on this device only.</div>
+  ensureDaily();
+  const T = window.LESSONS.find(x => x.id === DB.daily.id), p = pctOf(T, DB.progress[T.id]), done = p >= 100;
+  const past = order().filter(l => l.id !== T.id && pctOf(l, DB.progress[l.id]) > 0);
+  const vs = enVoices(), tf = done ? tomorrowField() : null;
+  const dateTxt = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  return `<div class="row" style="justify-content:space-between;padding-top:8px"><div class="row"><span class="lee">L</span><div><div style="font-size:12px;color:var(--muted)">${esc(dateTxt)}</div><div class="h" style="font-size:18px;font-weight:700">Hi ${esc(DB.name)}!</div></div></div><div style="text-align:right"><div class="pct">${streak()}</div><div style="font-size:11px;color:var(--muted)">day streak</div></div></div>
+  <div class="bubble"><span class="lee sm">L</span><div class="b" style="font-size:14px">${done ? `Great work today! Come back tomorrow for a new topic${tf ? ` – <b>${esc(FIELD_VI[tf] || tf)}</b>` : ''}.` : p > 0 ? 'Welcome back! Let’s finish today’s topic.' : `Today’s topic is about <b>${esc(FIELD_VI[T.field] || T.field)}</b>. Ready?`}</div></div>
+  <div class="card" style="padding:0;overflow:hidden;gap:0;border-color:${done ? 'var(--green-d)' : 'var(--line)'}"><div style="height:150px;position:relative">${window.sceneFor ? window.sceneFor(T, 0) : ''}</div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:10px"><div class="row" style="flex-wrap:wrap"><span class="chip g">TODAY · ${esc(T.field)}</span><span class="chip o">IELTS 6.0</span><span class="chip o">≈ 15 min</span></div><h1>${esc(T.title)}</h1><div class="sub">${esc(T.storyTitle)}</div>
+    <div class="bar" style="height:6px"><span style="width:${p}%"></span></div><div style="font-size:12px;color:var(--muted)">${p}% done</div>
+    <button class="btn" data-a="open" data-id="${T.id}">${done ? 'Review today’s lesson' : `${ico.play} ${p > 0 ? 'Resume' : 'Start today’s lesson'}`}</button></div></div>
+  ${past.length ? `<div class="card" style="gap:8px"><div class="h" style="font-size:15px;font-weight:600">Review past topics</div>${past.map(l => { const q = pctOf(l, DB.progress[l.id]); return `<button data-a="open" data-id="${l.id}" style="display:flex;justify-content:space-between;gap:10px;align-items:center;background:none;border:0;border-top:1px solid var(--line);padding:10px 0 2px;color:var(--text);cursor:pointer;text-align:left;width:100%"><span style="min-width:0"><span style="display:block;font-size:14px;font-weight:600">${esc(l.title)}</span><span style="font-size:12px;color:var(--muted)">${esc(FIELD_VI[l.field] || l.field)}</span></span><span class="h" style="font-weight:700;color:${q >= 100 ? '#44D62C' : '#FFC24B'}">${q >= 100 ? '✓' : q + '%'}</span></button>`; }).join('')}</div>` : ''}
+  <div class="card" style="gap:10px"><div class="h" style="font-size:15px;font-weight:600">Lee’s voice</div>
+    ${vs.length ? `<select data-a="voice" aria-label="Lee's voice" style="height:44px;border-radius:10px;background:#0F0F0F;color:#F2F2F2;border:1px solid #3A3A3A;padding:0 10px;font-size:15px">${vs.map(v => `<option value="${esc(v.name)}" ${voice && voice.name === v.name ? 'selected' : ''}>${esc(v.name)} (${esc(v.lang)})${FEMALE.test(v.name) ? ' · female' : ''}</option>`).join('')}</select>` : `<div class="sub">${ttsOk ? 'Loading voices…' : 'This browser cannot read aloud.'}</div>`}
+    <button class="btn2" data-a="say" data-t="Hi, I'm Lee. Let's practise English together." style="align-self:flex-start">${ico.spk} Hear Lee</button></div>
+  <div class="note">One new topic each day, rotating HR, banking, real estate and energy. Tap any English word to hear it. ${SR ? 'Speaking practice uses your microphone – allow it when asked.' : 'For speaking practice with the microphone, open this page in Safari (iPhone) or Chrome/Edge (computer).'} Progress is saved on this device only.</div>
   <button class="btn2" data-a="rename" style="align-self:flex-start">Change name</button>`;
 }
 const NAMES = ['Listen', 'Words', 'Grammar', 'Speak'];
 function header() {
   const segs = NAMES.map((n, i) => { const st = i + 1, lock = st > S.unlocked, cur = S.step === st, p = stepPcts()[i]; return `<button class="seg ${cur ? 'cur' : lock ? 'lock' : p >= 1 ? 'done' : ''}" data-a="go" data-s="${st}" ${lock ? 'aria-disabled="true"' : ''}>${lock ? ico.lock : p >= 1 ? ico.check : ''}${n}</button>`; }).join('');
-  return `<div class="top"><div class="toprow"><button class="btn2" data-a="home" aria-label="All lessons" style="width:40px;height:40px;padding:0">${ico.back}</button><div style="flex-grow:1;min-width:0"><div style="font-size:12px;color:var(--muted)">${esc(L.field)} · IELTS 6.0</div><div class="h" style="font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(L.title)}</div></div><div style="text-align:right"><div class="pct">${pctOf(L, S)}%</div></div></div><div class="segs">${segs}</div></div>`;
+  return `<div class="top"><div class="toprow"><button class="btn2" data-a="home" aria-label="Back to Today" style="width:40px;height:40px;padding:0">${ico.back}</button><div style="flex-grow:1;min-width:0"><div style="font-size:12px;color:var(--muted)">${esc(L.field)} · IELTS 6.0</div><div class="h" style="font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(L.title)}</div></div><div style="text-align:right"><div class="pct">${pctOf(L, S)}%</div></div></div><div class="segs">${segs}</div></div>`;
 }
 const nextBtn = (ok, label, lockText) => ok ? `<button class="btn" data-a="next">${label}</button>` : `<button class="btn" disabled>${ico.lock} ${lockText}</button>`;
 function vListen() {
@@ -107,7 +151,7 @@ function vListen() {
   }).join('');
   const keys = L.keys.map((k, j) => `<label style="display:flex;gap:10px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" data-a="tick" data-j="${j}" ${Ls.ticks.includes(j) ? 'checked' : ''} style="width:20px;height:20px;accent-color:#44D62C">${esc(k)}</label>`).join('');
   return `<div><div class="kicker">STEP 1 · LISTEN &amp; ANSWER</div><h1>${esc(L.storyTitle)}</h1><div class="sub">IELTS 6.0 style · sentence completion + short answer</div></div>
-  <div class="scene"><div aria-hidden="true" style="position:absolute;left:0;right:0;bottom:0;height:60px;background:#0C120B"></div><div aria-hidden="true" style="position:absolute;left:34px;bottom:60px;width:300px;height:10px;border-radius:3px;background:#1F3A1A"></div><div aria-hidden="true" style="position:absolute;left:60px;bottom:70px;width:40px;height:40px;border-radius:50%;background:#2E5E27"></div><div aria-hidden="true" style="position:absolute;left:48px;bottom:70px;width:64px;height:24px;border-radius:30px 30px 0 0;background:#2E5E27"></div><div aria-hidden="true" style="position:absolute;right:60px;bottom:70px;width:40px;height:40px;border-radius:50%;background:#44D62C;opacity:.55"></div><div aria-hidden="true" style="position:absolute;right:48px;bottom:70px;width:64px;height:24px;border-radius:30px 30px 0 0;background:#44D62C;opacity:.55"></div>${Ls.cc ? `<div class="sub-ov">${words(L.lines[i])}</div>` : ''}</div>
+  <div class="scene" role="img" aria-label="Picture for sentence ${i + 1}">${window.sceneFor ? window.sceneFor(L, i) : ''}${Ls.cc ? `<div class="sub-ov">${words(L.lines[i])}</div>` : ''}</div>
   <div class="player"><button class="play" data-a="toggle" aria-label="${playing ? 'Pause' : 'Play'}">${playing ? ico.pause : ico.play}</button><div style="flex-grow:1;display:flex;flex-direction:column;gap:5px"><div class="bar"><span style="width:${Math.round(((i + (playing ? 0.5 : 0)) / n) * 100)}%"></span></div><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)"><span>Sentence ${i + 1} / ${n}</span><span>${ttsOk ? 'Lee reads aloud' : 'Audio not supported'}</span></div></div><button class="cc ${Ls.cc ? 'on' : ''}" data-a="cc" aria-pressed="${Ls.cc}">CC</button></div>
   <div class="card"><div><div class="h" style="font-size:16px;font-weight:600">Questions 1–${L.fills.length}</div><div class="sub">Write ONE WORD AND/OR A NUMBER for each answer.</div></div>${fills}<button class="btn2 g" data-a="check">Check answers</button>
     <div style="height:1px;background:var(--line)"></div>
@@ -156,17 +200,17 @@ function vSpeak() {
   ${allDone ? `<button class="btn" data-a="next">Finish lesson</button>` : ''}`;
 }
 function vDone() {
-  const p = pctOf(L, S), idx = window.LESSONS.findIndex(x => x.id === L.id), nx = window.LESSONS[idx + 1];
+  const p = pctOf(L, S);
   return `<div class="done-ring"><svg width="96" height="96" viewBox="0 0 120 120" role="img" aria-label="${p} percent done"><circle cx="60" cy="60" r="50" fill="none" stroke="#2A2A2A" stroke-width="12"/><circle cx="60" cy="60" r="50" fill="none" stroke="#44D62C" stroke-width="12" stroke-linecap="round" stroke-dasharray="${p * 3.142} 314.2" transform="rotate(-90 60 60)"/></svg><div><div class="kicker">LESSON COMPLETE</div><h1>Well done, ${esc(DB.name)}!</h1></div></div>
   <div class="card"><div class="h" style="font-size:16px;font-weight:600">Words to keep</div><div class="row" style="flex-wrap:wrap">${L.words.map(w => `<button class="chip ol" data-a="word" data-w="${esc(w.en)}" style="background:none;cursor:pointer">${esc(w.en)}</button>`).join('')}</div></div>
-  ${nx ? `<button class="btn" data-a="open" data-id="${nx.id}">Next lesson: ${esc(nx.title)}</button>` : ''}
-  <button class="btn2" data-a="home">All lessons</button>`;
+  <div class="bubble"><span class="lee sm">L</span><div class="b" style="font-size:14px">That’s today’s topic done. See you tomorrow for a new one!</div></div>
+  <button class="btn" data-a="home">Back to Today</button>`;
 }
 function render() {
   const app = document.getElementById('app');
   if (VIEW === 'home' || !L) { app.innerHTML = vHome(); return; }
   refreshUnlock();
-  if (S.step === 5 && !S.finished) { S.finished = true; save(); }
+  if (S.step === 5 && !S.finished) { S.finished = true; DB.doneDates = [...new Set((DB.doneDates || []).concat(dayKey()))].slice(-400); save(); }
   app.innerHTML = header() + [null, vListen, vWords, vGrammar, vSpeak, vDone][S.step]();
 }
 
@@ -239,7 +283,7 @@ document.addEventListener('click', e => {
   else if (a === 'nextTurn') { S.speak.i = Math.min(S.speak.i + 1, L.speak.length - 1); LISTEN.err = ''; save(); render(); setTimeout(() => speak(L.speak[S.speak.i].lee, 0.95), 150); }
   else if (a === 'hideToggle') { S.speak.hide = !S.speak.hide; save(); render(); }
 });
-document.addEventListener('change', e => { const el = e.target; if (el.dataset && el.dataset.a === 'tick') { const j = +el.dataset.j; S.listen.ticks = el.checked ? [...new Set(S.listen.ticks.concat(j))] : S.listen.ticks.filter(x => x !== j); save(); } });
+document.addEventListener('change', e => { const el = e.target; if (el.dataset && el.dataset.a === 'voice') { DB.voice = el.value; saveDB(); pickVoice(); speak("Hi, I'm Lee.", 0.95); return; } if (el.dataset && el.dataset.a === 'tick') { const j = +el.dataset.j; S.listen.ticks = el.checked ? [...new Set(S.listen.ticks.concat(j))] : S.listen.ticks.filter(x => x !== j); save(); } });
 document.addEventListener('input', e => { const el = e.target; if (!el.dataset) return; if (el.dataset.a === 'fill') { S.listen.a[el.dataset.q] = el.value; S.listen.checked = false; save(); } if (el.dataset.a === 'q4') { S.listen.q4 = el.value; save(); } });
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'nameIn') document.querySelector('[data-a=setName]').click(); });
 document.getElementById('scrim').addEventListener('click', closeSheet);

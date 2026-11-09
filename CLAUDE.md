@@ -7,8 +7,11 @@ Free static web app (GitHub Pages) for learning everyday workplace English: HR, 
 
 ## Structure
 - `index.html` – shell, styles (dark theme, neon green #44D62C, Chakra Petch + Inter).
-- `lessons.js` – `window.LESSONS`: each lesson has `id, field, title, storyTitle, lines[8], fills[3]{text,ans[],line,word}, explainQ, evidence[], model, keys[], words[5]{en,ipa,vi,def,ex}, grammar{title,why,examples,focus,qs[{q,opts,a,why}]}, speak[4]{lee,target,vi}, dict{}`. `fills[].word` must appear in `lines[line]`.
-- `app.js` – UI and logic. No server, no AI: browser speech synthesis (Lee's voice), Web Speech recognition for speaking practice, local alignment scoring (`compare`). Progress in `localStorage` key `lee-english-v1`.
+- `lessons.js` – `window.LESSONS`: each lesson has `id, field, title, storyTitle, lines[8], fills[3]{text,ans[],line,word}, explainQ, evidence[], model, keys[], words[5]{en,ipa,vi,def,ex}, grammar{title,why,examples,focus,qs[{q,opts,a,why}]}, speak[4]{lee,target,vi}, dict{}, frames[[startLine, sceneKey]]`. `fills[].word` must appear in `lines[line]`. Scene keys come from `scenes.js`.
+- `scenes.js` – `window.SCENES` flat SVG illustrations (office, meeting, document, server, checklist, bank, apartment, balcony, money, interview, handshake, calendar, factory, solar, windfarm, substation, welcome, helmet, phone, wrench, warning); `sceneFor(lesson, line)` picks the picture for the current sentence.
+- `app.js` – UI and logic. No server, no AI: browser speech synthesis (Lee's voice), Web Speech recognition for speaking practice, local alignment scoring (`compare`). Progress in `localStorage` key `lee-english-v1` (`DB.progress`, `DB.daily`, `DB.doneDates`, `DB.voice`).
+- One topic per day: `ensureDaily()` picks today's lesson (unfinished one carries over; otherwise next in `order()`, which rotates HR → BANKING → REAL ESTATE → ENERGY). Home shows only today's topic plus past topics to review.
+- Lee's voice: female English voice preferred (en-GB first); learners can pick any English voice on the home screen.
 
 ## Rules
 - UI text in English; Vietnamese only for meanings and hints.

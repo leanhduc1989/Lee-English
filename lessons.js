@@ -3,6 +3,7 @@
 window.LESSONS = [
 {
   id: 'bank-oprisk', field: 'BANKING', title: 'Reporting an operational risk incident', storyTitle: 'The missing signature',
+  frames: [[0, 'meeting'], [1, 'document'], [4, 'server'], [6, 'checklist']],
   lines: [
     "Every month, Lan's team updates the operational risk log at her bank.",
     "On Thursday, a branch officer reported a problem: a loan contract had been approved without a second signature.",
@@ -48,6 +49,7 @@ window.LESSONS = [
 },
 {
   id: 'bank-loan', field: 'BANKING', title: 'Explaining a home loan to a customer', storyTitle: 'Mr Hùng’s first flat',
+  frames: [[0, 'bank'], [2, 'apartment'], [3, 'money'], [7, 'document']],
   lines: [
     "Mr Hùng visited the bank on Saturday morning because he wanted to buy his first flat.",
     "Trang, a loan officer, asked how much the flat cost and how much he had saved.",
@@ -93,6 +95,7 @@ window.LESSONS = [
 },
 {
   id: 'hr-interview', field: 'HR', title: 'Running a job interview', storyTitle: 'The accountant interview',
+  frames: [[0, 'office'], [2, 'interview'], [4, 'document'], [6, 'handshake']],
   lines: [
     "Linh works in HR at a logistics company and is hiring a senior accountant.",
     "Before the interview, she prepared five questions based on the job description.",
@@ -138,6 +141,7 @@ window.LESSONS = [
 },
 {
   id: 'hr-no', field: 'HR', title: 'Saying no politely to your manager', storyTitle: 'Too many projects',
+  frames: [[0, 'office'], [1, 'meeting'], [2, 'calendar'], [6, 'handshake']],
   lines: [
     "Mai works in the HR team of an energy company in Ho Chi Minh City.",
     "On Monday, her manager asked her to lead a new training project for forty engineers.",
@@ -183,6 +187,7 @@ window.LESSONS = [
 },
 {
   id: 're-viewing', field: 'REAL ESTATE', title: 'Showing an apartment to a client', storyTitle: 'A flat with a river view',
+  frames: [[0, 'apartment'], [3, 'balcony'], [4, 'money'], [7, 'document']],
   lines: [
     "Nam is a property agent, and on Sunday he showed a two-bedroom flat to Emma and Tom.",
     "The couple had just moved to Da Nang for work and wanted something close to the beach.",
@@ -228,6 +233,7 @@ window.LESSONS = [
 },
 {
   id: 're-negotiate', field: 'REAL ESTATE', title: 'Negotiating office rent', storyTitle: 'Three months free',
+  frames: [[0, 'office'], [2, 'meeting'], [4, 'document'], [6, 'handshake']],
   lines: [
     "Hà manages facilities for a tech company that needs a bigger office in Hanoi.",
     "She found a good floor in a new building, but the rent was higher than her budget.",
@@ -273,6 +279,7 @@ window.LESSONS = [
 },
 {
   id: 'en-solar', field: 'ENERGY', title: 'Presenting a rooftop solar project', storyTitle: 'Sunlight on the factory roof',
+  frames: [[0, 'factory'], [2, 'solar'], [5, 'money'], [7, 'document']],
   lines: [
     "An is an engineer at a solar company, and last week she presented a project to a shoe factory.",
     "The factory used a lot of electricity, especially in the hot afternoons.",
@@ -318,6 +325,7 @@ window.LESSONS = [
 },
 {
   id: 'en-grid', field: 'ENERGY', title: 'Reporting a project delay', storyTitle: 'Waiting for the grid',
+  frames: [[0, 'windfarm'], [2, 'substation'], [4, 'meeting'], [6, 'windfarm']],
   lines: [
     "Quân is the project manager for a wind farm in Ninh Thuận.",
     "The turbines were ready, but the farm could not sell electricity yet.",
@@ -361,4 +369,189 @@ window.LESSONS = [
   ],
   dict: { project: 'dự án', manager: 'quản lý', turbines: 'tua-bin', turbine: 'tua-bin', ready: 'sẵn sàng', electricity: 'điện', connects: 'kết nối', transformer: 'máy biến áp', arrived: 'đã đến', weather: 'thời tiết', port: 'cảng', weekly: 'hằng tuần', situation: 'tình hình', clearly: 'rõ ràng', calmly: 'bình tĩnh', connection: 'sự đấu nối', instead: 'thay vì', reduce: 'giảm', loss: 'thiệt hại', investors: 'nhà đầu tư', facts: 'sự thật, dữ kiện', early: 'sớm' }
 }
+,{
+  id: 'hr-onboarding', field: 'HR', title: 'Welcoming a new employee', storyTitle: 'Daniel’s first day',
+  frames: [[0, 'welcome'], [3, 'office'], [5, 'helmet'], [7, 'calendar']],
+  lines: [
+    "Phương works in HR, and on Monday she welcomed Daniel, a new engineer from Australia.",
+    "She met him at reception at eight thirty and gave him his staff ID card.",
+    "Then she introduced him to his buddy, Khánh, who had worked in the team for five years.",
+    "Khánh showed Daniel his desk and helped him set up his laptop and email.",
+    "Before lunch, Phương explained the company's working hours and the leave policy.",
+    "In the afternoon, Daniel joined a safety training session for all new staff.",
+    "At the end of the day, Phương asked him how he felt and whether he had any questions.",
+    "She told him they were going to meet every Friday during his first month."
+  ],
+  fills: [
+    { text: 'Phương gave Daniel his staff ID ______.', ans: ['card'], line: 1, word: 'card' },
+    { text: 'Khánh had worked in the team for ______ years.', ans: ['five', '5'], line: 2, word: 'five' },
+    { text: 'In the afternoon, Daniel joined a ______ training session.', ans: ['safety'], line: 5, word: 'safety' }
+  ],
+  explainQ: 'How did Phương help Daniel feel welcome, and what is the plan for his first month?', evidence: [6, 7],
+  model: 'Phương helped Daniel by giving him a buddy and asking how he felt at the end of the day. During his first month, they are going to meet every Friday.',
+  keys: ['A buddy (Khánh)', 'She asked how he felt', 'Meetings every Friday for a month'],
+  words: [
+    { en: 'reception', ipa: '/rɪˈsepʃn/', vi: 'quầy lễ tân', def: 'The desk where visitors arrive in a building.', ex: 'She met him at reception at eight thirty.' },
+    { en: 'buddy', ipa: '/ˈbʌdi/', vi: 'người kèm cặp, bạn đồng hành', def: 'A colleague who helps a new person settle in.', ex: 'She introduced him to his buddy, Khánh.' },
+    { en: 'set up', ipa: '/ˌset ˈʌp/', vi: 'cài đặt, thiết lập', def: 'To prepare something so it is ready to use.', ex: 'He helped him set up his laptop and email.' },
+    { en: 'leave policy', ipa: '/ˈliːv ˌpɒləsi/', vi: 'chính sách nghỉ phép', def: 'The company rules about holidays and time off.', ex: 'She explained the leave policy.' },
+    { en: 'onboarding', ipa: '/ˈɒnbɔːdɪŋ/', vi: 'quy trình hội nhập nhân viên mới', def: 'Helping a new employee start their job.', ex: 'Daniel’s onboarding started on Monday.' }
+  ],
+  grammar: {
+    title: 'be going to + verb for plans',
+    why: 'Use it for plans that are already decided – perfect for explaining a new employee’s schedule.',
+    examples: ['They are going to meet every Friday.', 'You are going to join a safety training this afternoon.', 'Khánh is going to show you the office.'],
+    focus: ['going', 'to'],
+    qs: [
+      { q: 'Tomorrow, Daniel ______ meet the director.', opts: ['is going to', 'going to', 'goes to'], a: 0, why: 'be + going to + verb: is going to meet.' },
+      { q: 'We ______ give you a laptop on your first day.', opts: ['are going', 'are going to', 'going to'], a: 1, why: 'Plans: are going to + verb.' }
+    ]
+  },
+  speak: [
+    { lee: 'Welcome to the company! How was your trip this morning?', target: 'It was fine, thank you. The traffic was not too bad.', vi: 'Ổn ạ, cảm ơn chị. Đường không quá đông.' },
+    { lee: 'This is Khánh, your buddy. Do you have any questions for him?', target: 'Nice to meet you. Could you help me set up my laptop?', vi: 'Rất vui được gặp anh. Anh giúp tôi cài đặt máy tính được không?' },
+    { lee: 'What are you going to do this afternoon?', target: 'I am going to join the safety training.', vi: 'Chiều nay tôi sẽ tham gia buổi đào tạo an toàn.' },
+    { lee: 'How do you feel after your first day?', target: 'I feel welcome, and everyone has been very helpful.', vi: 'Tôi cảm thấy được chào đón, mọi người đều rất nhiệt tình.' }
+  ],
+  dict: { welcomed: 'đã chào đón', engineer: 'kỹ sư', staff: 'nhân viên', card: 'thẻ', introduced: 'đã giới thiệu', desk: 'bàn làm việc', laptop: 'máy tính xách tay', email: 'thư điện tử', lunch: 'bữa trưa', explained: 'đã giải thích', hours: 'giờ', leave: 'nghỉ phép', policy: 'chính sách', afternoon: 'buổi chiều', joined: 'đã tham gia', safety: 'an toàn', training: 'đào tạo', session: 'buổi', felt: 'đã cảm thấy', whether: 'liệu, có hay không', friday: 'thứ Sáu', during: 'trong suốt' }
+},
+{
+  id: 'bank-complaint', field: 'BANKING', title: 'Handling a customer complaint', storyTitle: 'Charged twice',
+  frames: [[0, 'phone'], [2, 'bank'], [5, 'money'], [7, 'handshake']],
+  lines: [
+    "Mrs Lan called the bank because her card had been charged twice for the same hotel booking.",
+    "She was angry, as the extra payment of four million dong had left her account almost empty.",
+    "Khoa, a customer service officer, listened carefully and did not interrupt her.",
+    "He apologised and said, “I understand how frustrating this must be for you.”",
+    "After checking the system, he found that the hotel had sent the payment request twice.",
+    "Khoa explained that the bank should have blocked the second payment automatically.",
+    "He promised that the money would be returned within three working days.",
+    "Mrs Lan thanked him, and Khoa sent her an email with a reference number for the case."
+  ],
+  fills: [
+    { text: 'The extra payment was ______ million dong.', ans: ['four', '4'], line: 1, word: 'four' },
+    { text: 'The hotel had sent the payment request ______.', ans: ['twice'], line: 4, word: 'twice' },
+    { text: 'The money would be returned within three working ______.', ans: ['days'], line: 6, word: 'days' }
+  ],
+  explainQ: 'What caused the double payment, and how did Khoa handle the customer?', evidence: [2, 3],
+  model: 'The hotel had sent the payment request twice. Khoa listened carefully, apologised, and promised that the money would be returned within three working days.',
+  keys: ['The hotel sent the request twice', 'He listened and apologised', 'Refund within three working days'],
+  words: [
+    { en: 'complaint', ipa: '/kəmˈpleɪnt/', vi: 'lời phàn nàn, khiếu nại', def: 'A statement that something is wrong.', ex: 'Khoa handled the customer’s complaint.' },
+    { en: 'interrupt', ipa: '/ˌɪntəˈrʌpt/', vi: 'ngắt lời', def: 'To stop someone while they are speaking.', ex: 'He listened carefully and did not interrupt her.' },
+    { en: 'apologise', ipa: '/əˈpɒlədʒaɪz/', vi: 'xin lỗi', def: 'To say sorry for a mistake.', ex: 'He apologised to Mrs Lan.' },
+    { en: 'frustrating', ipa: '/frʌˈstreɪtɪŋ/', vi: 'gây bực bội', def: 'Making you feel annoyed and upset.', ex: 'I understand how frustrating this must be.' },
+    { en: 'reference number', ipa: '/ˈrefrəns ˌnʌmbə/', vi: 'mã số hồ sơ', def: 'A number used to find a case later.', ex: 'He sent her an email with a reference number.' }
+  ],
+  grammar: {
+    title: 'should have + past participle',
+    why: 'Use it to say something was the right thing to do, but it did not happen – useful when you admit a mistake politely.',
+    examples: ['The bank should have blocked the second payment.', 'We should have told you earlier.', 'I should have checked the booking.'],
+    focus: ['should', 'have'],
+    qs: [
+      { q: 'The system ______ the payment automatically.', opts: ['should have stopped', 'should stopped', 'should have stop'], a: 0, why: 'should have + past participle (stopped).' },
+      { q: 'You ______ me about the problem sooner.', opts: ['should told', 'should have told', 'should have tell'], a: 1, why: 'should have + past participle (told).' }
+    ]
+  },
+  speak: [
+    { lee: 'Good morning, this is the customer service team. How can I help?', target: 'My card was charged twice for the same booking.', vi: 'Thẻ của tôi bị trừ tiền hai lần cho cùng một đặt phòng.' },
+    { lee: 'I am very sorry about that. How much was the extra payment?', target: 'It was four million dong.', vi: 'Là bốn triệu đồng.' },
+    { lee: 'I have checked the system. The hotel sent the request twice.', target: 'I see. When will I get my money back?', vi: 'Tôi hiểu rồi. Khi nào tôi nhận lại tiền?' },
+    { lee: 'Within three working days. Is there anything else?', target: 'Could you send me a reference number by email?', vi: 'Anh gửi tôi mã số hồ sơ qua email được không?' }
+  ],
+  dict: { called: 'đã gọi điện', charged: 'bị trừ tiền', twice: 'hai lần', same: 'giống nhau', hotel: 'khách sạn', booking: 'đặt phòng', angry: 'tức giận', extra: 'thêm', payment: 'khoản thanh toán', million: 'triệu', account: 'tài khoản', empty: 'trống', listened: 'đã lắng nghe', carefully: 'cẩn thận', understand: 'hiểu', checking: 'kiểm tra', request: 'yêu cầu', blocked: 'đã chặn', automatically: 'tự động', promised: 'đã hứa', returned: 'được trả lại', within: 'trong vòng', working: 'làm việc', thanked: 'đã cảm ơn', case: 'vụ việc' }
+},
+{
+  id: 're-repair', field: 'REAL ESTATE', title: 'Handling a repair request', storyTitle: 'The leaking air conditioner',
+  frames: [[0, 'apartment'], [2, 'phone'], [4, 'wrench'], [7, 'checklist']],
+  lines: [
+    "Sarah rents a flat in a building that Tuấn manages for a property company.",
+    "One evening, water started dripping from the air conditioner in her bedroom.",
+    "She sent Tuấn a message with a photo and asked him to get it fixed as soon as possible.",
+    "Tuấn replied within ten minutes and asked her to turn the air conditioner off.",
+    "The next morning, he had a technician come to the flat to check it.",
+    "The technician found that the water pipe was blocked and cleaned it in half an hour.",
+    "Tuấn told Sarah that the repair was free, because it was the landlord's responsibility.",
+    "He also decided to have all the air conditioners in the building serviced every six months."
+  ],
+  fills: [
+    { text: 'Tuấn replied within ______ minutes.', ans: ['ten', '10'], line: 3, word: 'ten' },
+    { text: 'The water ______ was blocked.', ans: ['pipe'], line: 5, word: 'pipe' },
+    { text: 'All air conditioners will be serviced every ______ months.', ans: ['six', '6'], line: 7, word: 'six' }
+  ],
+  explainQ: 'Why did Sarah not have to pay, and what did Tuấn decide to do for the whole building?', evidence: [6, 7],
+  model: 'Sarah did not have to pay because the repair was the landlord’s responsibility. Tuấn decided to have all the air conditioners serviced every six months.',
+  keys: ['The landlord is responsible', 'The repair was free', 'Service every six months'],
+  words: [
+    { en: 'drip', ipa: '/drɪp/', vi: 'nhỏ giọt', def: 'To fall in small drops.', ex: 'Water started dripping from the air conditioner.' },
+    { en: 'technician', ipa: '/tekˈnɪʃn/', vi: 'kỹ thuật viên', def: 'A person who repairs machines and equipment.', ex: 'He had a technician come to the flat.' },
+    { en: 'blocked', ipa: '/blɒkt/', vi: 'bị tắc', def: 'Closed so that nothing can pass through.', ex: 'The water pipe was blocked.' },
+    { en: 'responsibility', ipa: '/rɪˌspɒnsəˈbɪləti/', vi: 'trách nhiệm', def: 'A duty to deal with something.', ex: 'It was the landlord’s responsibility.' },
+    { en: 'service', ipa: '/ˈsɜːvɪs/', vi: 'bảo dưỡng', def: 'To check and repair a machine regularly.', ex: 'He decided to have them serviced every six months.' }
+  ],
+  grammar: {
+    title: 'Causative: have/get something done',
+    why: 'Use it when you arrange for someone else to do a job for you – very common in property management.',
+    examples: ['She asked him to get it fixed as soon as possible.', 'He had a technician come to the flat.', 'We have the air conditioners serviced every six months.'],
+    focus: ['get', 'had', 'have'],
+    qs: [
+      { q: 'I need to ______ my door lock repaired.', opts: ['have', 'make', 'do'], a: 0, why: 'have + object + past participle.' },
+      { q: 'We got the windows ______ last week.', opts: ['clean', 'cleaning', 'cleaned'], a: 2, why: 'get + object + past participle (cleaned).' }
+    ]
+  },
+  speak: [
+    { lee: 'Hi, this is Tuấn, the building manager. What seems to be the problem?', target: 'Water is dripping from the air conditioner in my bedroom.', vi: 'Nước đang nhỏ giọt từ máy lạnh trong phòng ngủ của tôi.' },
+    { lee: 'I am sorry to hear that. Have you turned it off?', target: 'Yes, I have turned it off.', vi: 'Vâng, tôi đã tắt nó rồi.' },
+    { lee: 'I can have a technician come tomorrow morning. Is nine OK?', target: 'Nine is fine. Will I have to pay for the repair?', vi: 'Chín giờ được. Tôi có phải trả tiền sửa không?' },
+    { lee: 'No, it is the landlord’s responsibility.', target: 'Great, thank you for your quick help.', vi: 'Tuyệt, cảm ơn anh đã giúp nhanh.' }
+  ],
+  dict: { rents: 'thuê', flat: 'căn hộ', building: 'tòa nhà', manages: 'quản lý', property: 'bất động sản', evening: 'buổi tối', water: 'nước', dripping: 'nhỏ giọt', air: 'không khí', conditioner: 'máy điều hòa', bedroom: 'phòng ngủ', message: 'tin nhắn', photo: 'ảnh', fixed: 'được sửa', possible: 'có thể', replied: 'đã trả lời', minutes: 'phút', technician: 'kỹ thuật viên', check: 'kiểm tra', pipe: 'ống', blocked: 'bị tắc', cleaned: 'đã làm sạch', repair: 'việc sửa chữa', free: 'miễn phí', landlord: 'chủ nhà', decided: 'đã quyết định', serviced: 'được bảo dưỡng' }
+},
+{
+  id: 'en-safety', field: 'ENERGY', title: 'Giving a safety briefing on site', storyTitle: 'Safety first on the roof',
+  frames: [[0, 'solar'], [2, 'helmet'], [5, 'warning'], [7, 'checklist']],
+  lines: [
+    "Every morning at seven, Hải gives a safety briefing to the team installing solar panels on a warehouse roof.",
+    "Today, two new workers had joined the team, so he spoke slowly and clearly.",
+    "He said that everyone must wear a helmet, gloves and a safety harness on the roof.",
+    "Workers have to clip the harness to the safety line before they walk near the edge.",
+    "They don't have to bring their own tools, because the company provides them.",
+    "However, nobody must work on the roof when it is raining or very windy.",
+    "One new worker asked what to do if he saw a damaged cable.",
+    "Hải told him to stop work immediately and report it to him by radio."
+  ],
+  fills: [
+    { text: 'Hải gives the briefing every morning at ______.', ans: ['seven', '7'], line: 0, word: 'seven' },
+    { text: '______ new workers had joined the team.', ans: ['two', '2'], line: 1, word: 'two' },
+    { text: 'Workers must report a damaged cable by ______.', ans: ['radio'], line: 7, word: 'radio' }
+  ],
+  explainQ: 'What equipment must workers wear on the roof, and when must nobody work there?', evidence: [2, 5],
+  model: 'Workers must wear a helmet, gloves and a safety harness on the roof. Nobody must work there when it is raining or very windy.',
+  keys: ['Helmet, gloves and harness', 'Clip to the safety line', 'No work in rain or strong wind'],
+  words: [
+    { en: 'briefing', ipa: '/ˈbriːfɪŋ/', vi: 'buổi phổ biến nhanh', def: 'A short meeting to give instructions.', ex: 'Hải gives a safety briefing every morning.' },
+    { en: 'harness', ipa: '/ˈhɑːnɪs/', vi: 'dây đai an toàn', def: 'Straps worn to stop you from falling.', ex: 'Everyone must wear a safety harness.' },
+    { en: 'edge', ipa: '/edʒ/', vi: 'mép, rìa', def: 'The outside end of a surface.', ex: 'Clip the harness before walking near the edge.' },
+    { en: 'provide', ipa: '/prəˈvaɪd/', vi: 'cung cấp', def: 'To give something that people need.', ex: 'The company provides the tools.' },
+    { en: 'damaged', ipa: '/ˈdæmɪdʒd/', vi: 'bị hư hỏng', def: 'Broken or harmed.', ex: 'What if he saw a damaged cable?' }
+  ],
+  grammar: {
+    title: 'must / have to / don’t have to',
+    why: 'must and have to = necessary; don’t have to = not necessary; must not = not allowed. Key for safety rules.',
+    examples: ['Everyone must wear a helmet.', 'Workers have to clip the harness to the safety line.', 'They don’t have to bring their own tools.'],
+    focus: ['must', 'have', 'don’t'],
+    qs: [
+      { q: 'You ______ bring gloves – we have spare ones.', opts: ["don't have to", 'must', 'have to'], a: 0, why: 'It is not necessary: don’t have to.' },
+      { q: 'You ______ walk near the edge without a harness.', opts: ["don't have to", 'must not', 'have to'], a: 1, why: 'It is not allowed: must not.' }
+    ]
+  },
+  speak: [
+    { lee: 'Good morning, team. What must everyone wear on the roof?', target: 'We must wear a helmet, gloves and a safety harness.', vi: 'Chúng ta phải đội mũ bảo hộ, đeo găng tay và dây đai an toàn.' },
+    { lee: 'What do you have to do before you walk near the edge?', target: 'We have to clip the harness to the safety line.', vi: 'Chúng ta phải móc dây đai vào dây an toàn.' },
+    { lee: 'Do you need to bring your own tools?', target: 'No, we don’t have to, because the company provides them.', vi: 'Không, không cần, vì công ty cung cấp.' },
+    { lee: 'What should you do if you see a damaged cable?', target: 'I should stop work and report it by radio.', vi: 'Tôi nên dừng việc và báo qua bộ đàm.' }
+  ],
+  dict: { morning: 'buổi sáng', gives: 'đưa ra', safety: 'an toàn', installing: 'đang lắp đặt', solar: 'mặt trời', panels: 'tấm pin', warehouse: 'nhà kho', roof: 'mái nhà', workers: 'công nhân', joined: 'đã gia nhập', slowly: 'chậm', clearly: 'rõ ràng', wear: 'mặc, đeo', helmet: 'mũ bảo hộ', gloves: 'găng tay', clip: 'móc vào', line: 'dây', walk: 'đi bộ', near: 'gần', bring: 'mang theo', tools: 'dụng cụ', provides: 'cung cấp', however: 'tuy nhiên', raining: 'đang mưa', windy: 'nhiều gió', cable: 'dây cáp', immediately: 'ngay lập tức', report: 'báo cáo', radio: 'bộ đàm' }
+}
+
 ];
